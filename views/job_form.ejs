@@ -1,0 +1,66 @@
+<%- include('partials/header') %>
+
+    <div class="frame">
+        <section class="card" style="max-width: 800px; margin: 0 auto;">
+            <h2>
+                <%= job ? 'Edit Job' : 'Post a New Job' %>
+            </h2>
+
+            <form action="<%= action %>" method="post" enctype="multipart/form-data">
+                <div class="form-row">
+                    <label class="label" for="title">Job Title</label>
+                    <input class="input" type="text" id="title" name="title" value="<%= job ? job.title : '' %>"
+                        required />
+                </div>
+
+                <div class="form-row">
+                    <label class="label" for="description">Description</label>
+                    <textarea class="input" id="description" name="description" rows="4"
+                        required><%= job ? job.description : '' %></textarea>
+                </div>
+
+                <div class="row" style="grid-template-columns: 1fr 1fr;">
+                    <div class="field">
+                        <label class="label" for="location">Location</label>
+                        <input class="input" type="text" id="location" name="location"
+                            value="<%= job ? job.location : '' %>" required />
+                    </div>
+                    <div class="field">
+                        <label class="label" for="pay">Pay Rate</label>
+                        <input class="input" type="text" id="pay" name="pay" value="<%= job ? job.pay : '' %>"
+                            placeholder="$15/hr" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="label" for="age_range">Age Range</label>
+                    <select class="input" id="age_range" name="age_range">
+                        <option value="14-15" <%=(job && job.age_range==='14-15' ) ? 'selected' : '' %>>14-15</option>
+                        <option value="16-17" <%=(job && job.age_range==='16-17' ) ? 'selected' : '' %>>16-17</option>
+                        <option value="18+" <%=(job && job.age_range==='18+' ) ? 'selected' : '' %>>18+</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label class="label" for="image">Job Image</label>
+                    <% if (job && job.image_path) { %>
+                        <div style="margin-bottom:10px;">
+                            <img src="<%= job.image_path %>" alt="Current Image"
+                                style="height:100px; border-radius:8px;">
+                            <p class="muted" style="font-size:12px;">Current Image</p>
+                        </div>
+                        <% } %>
+                            <input class="input" type="file" id="image" name="image" accept="image/*" />
+                </div>
+
+                <div class="actions" style="margin-top:20px;">
+                    <button class="btn btn-gradient btn-block" type="submit">
+                        <%= job ? 'Update Job' : 'Post Job' %>
+                    </button>
+                    <a class="btn btn-outline btn-block" href="/dashboard">Cancel</a>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <%- include('partials/footer') %>

@@ -1,0 +1,163 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <section class="hero-wrap">
+            <div class="hero-bg" aria-hidden="true"></div>
+            <div class="hero">
+                <div>
+                    <span class="badge">🔒 Parent-Trusted • Teen-Friendly</span>
+                    <h1>The best place for teens to find safe, nearby jobs.</h1>
+                    <p>Discover age-appropriate opportunities within walking distance. Built for summer energy,
+                        school-year balance, and parental peace of mind.</p>
+                    <div class="hero-cta">
+                        <a class="btn primary" href="#search">Find jobs near me</a>
+                        <% if (!user) { %>
+                            <a class="btn" href="/login">Get Started / Login</a>
+                            <% } %>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- SEARCH (glass) -->
+    <section id="search" class="search">
+        <form action="/" method="GET">
+            <div class="row">
+                <div class="field">
+                    <label for="search">Keywords</label>
+                    <input id="search" name="search" type="text" placeholder="e.g., Retail, Tutor"
+                        value="<%= searchParams.search || '' %>">
+                </div>
+
+                <div class="field">
+                    <label for="location">Location</label>
+                    <input id="location" name="location" type="text" placeholder="City or Zip"
+                        value="<%= searchParams.location || '' %>">
+                </div>
+
+                <div class="field">
+                    <label for="age">Age filter</label>
+                    <select id="age" name="age">
+                        <option value="">Any Age</option>
+                        <option value="14" <%=searchParams.age==='14' ? 'selected' : '' %>>14–15 (non-hazardous, hour
+                            limits)</option>
+                        <option value="16" <%=searchParams.age==='16' ? 'selected' : '' %>>16–17 (non-hazardous)
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-chips" style="margin-top: 15px; justify-content: flex-end;">
+                <button class="btn primary" type="submit">Search Jobs</button>
+            </div>
+        </form>
+    </section>
+
+    <div class="container">
+        <div class="spacer"></div>
+
+        <!-- JOB RESULTS -->
+        <section id="catalog" class="section">
+            <h2 style="font-size:28px;margin-bottom:8px">Available Jobs</h2>
+            <% if (jobs.length> 0) { %>
+                <div class="grid">
+                    <% jobs.forEach(job=> { %>
+                        <div class="card">
+                            <% if (job.image_path) { %>
+                                <img src="<%= job.image_path %>" alt="<%= job.title %>"
+                                    style="width:100%; height:150px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
+                                <% } %>
+                                    <h3 style="margin:0 0 8px">
+                                        <%= job.title %>
+                                    </h3>
+                                    <div class="badge" style="color: #333; background: #eee; border:none;">
+                                        <%= job.location %>
+                                    </div>
+                                    <div class="badge" style="color: #333; background: #eee; border:none;">
+                                        <%= job.pay %>
+                                    </div>
+                                    <p class="muted">
+                                        <%= job.description %>
+                                    </p>
+                                    <div class="who" style="margin-top:10px; font-size:12px; color:#888;">Age: <%=
+                                            job.age_range %>
+                                    </div>
+                        </div>
+                        <% }); %>
+                </div>
+                <% } else { %>
+                    <p style="text-align:center; color:#fff; font-size:18px;">No jobs found matching your criteria.</p>
+                    <% } %>
+        </section>
+
+        <!-- TRUST STATS -->
+        <section class="trust">
+            <div class="card">
+                <div class="stat">4.9★</div>
+                <div class="muted">Average teen rating</div>
+            </div>
+            <div class="card">
+                <div class="stat">12k+</div>
+                <div class="muted">Successful summer matches</div>
+            </div>
+            <div class="card">
+                <div class="stat">99%</div>
+                <div class="muted">Profiles verified for safety</div>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS -->
+        <section id="reviews" class="section">
+            <h2 style="font-size:28px;margin-bottom:8px">What teens & parents say</h2>
+            <div class="grid">
+                <div class="card review">
+                    <div class="stars">★★★★★</div>
+                    <p>“Found a weekend job 2 miles from home. Hours work great with school!”</p>
+                    <div class="who">— Alex, 16</div>
+                </div>
+                <div class="card review">
+                    <div class="stars">★★★★★</div>
+                    <p>“My daughter learned budgeting and responsibility. The safety checks reassured us.”</p>
+                    <div class="who">— Maria, Parent</div>
+                </div>
+                <div class="card review">
+                    <div class="stars">★★★★★</div>
+                    <p>“Perfect for summer — applied on Monday, interview by Friday.”</p>
+                    <div class="who">— Jordan, 17</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEGAL QUICK GUIDE -->
+        <section class="legal">
+            <div class="card">
+                <h2 style="margin-top:0">Know the rules (quick guide)</h2>
+                <ul>
+                    <li><strong>Minimum age:</strong> Generally 14 for most non-ag jobs.</li>
+                    <li><strong>14–15:</strong> Limited hours, outside school, non-hazardous roles.</li>
+                    <li><strong>16–17:</strong> No federal hour limits; still <em>no hazardous work</em> until 18.</li>
+                    <li><strong>Permits & consent:</strong> Many states require a work permit/parent OK. Check your
+                        state.</li>
+                </ul>
+                <p class="muted" style="margin-top:8px">
+                    Sources: U.S. DOL YouthRules & Child Labor Fact Sheets. Always follow federal & state laws.
+                </p>
+            </div>
+            <div class="card">
+                <h3 style="margin-top:0">Helpful links</h3>
+                <ul>
+                    <li><a href="https://www.dol.gov/agencies/whd/youthrules" target="_blank" rel="noopener"
+                            style="color:#2563eb">DOL YouthRules (overview)</a></li>
+                    <li><a href="https://www.dol.gov/agencies/whd/fact-sheets/43-child-labor-non-agriculture"
+                            target="_blank" rel="noopener" style="color:#2563eb">Fact Sheet: Non-ag Jobs</a></li>
+                    <li><a href="https://www.dol.gov/agencies/whd/state/child-labor" target="_blank" rel="noopener"
+                            style="color:#2563eb">State-by-State rules</a></li>
+                </ul>
+                <p class="muted" style="font-size:13px">This site is a demo. Search results coming soon.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <%- include('partials/footer') %>

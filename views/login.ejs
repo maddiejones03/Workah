@@ -1,0 +1,49 @@
+<%- include('partials/header') %>
+
+    <div class="frame">
+        <main class="content">
+            <!-- Left side matches landing vibe -->
+            <section class="panel-left" aria-hidden="true">
+                <div class="left-inner">
+                    <span class="badge">🔒 Parent‑Trusted • Teen‑Friendly</span>
+                    <h1 class="title">The best place for teens to find safe, nearby jobs.</h1>
+                    <p class="subtitle">Log in to apply for jobs, track applications, and message local businesses.
+                        Workah follows all U.S. youth labor laws; opportunities for 14–15 year‑olds are limited to
+                        non‑hazardous roles.</p>
+                </div>
+            </section>
+
+            <!-- Right side: login card -->
+            <section class="card" aria-label="Login form">
+                <h2>Welcome back</h2>
+                <p class="muted">Sign in to your Workah account</p>
+
+                <% if (error) { %>
+                    <div style="color: var(--danger); margin-bottom: 15px;">
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <form action="/login" method="post">
+                            <div class="form-row">
+                                <label class="label" for="email">Email</label>
+                                <input class="input" type="email" id="email" name="email" placeholder="you@example.com"
+                                    required />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="label" for="password">Password</label>
+                                <input class="input" type="password" id="password" name="password"
+                                    placeholder="••••••••" required />
+                            </div>
+
+                            <div class="actions">
+                                <button class="btn btn-gradient btn-block" type="submit">Login</button>
+                                <a class="btn btn-outline btn-block" href="/register">Create a new account</a>
+                            </div>
+                        </form>
+            </section>
+        </main>
+    </div>
+
+    <%- include('partials/footer') %>

@@ -1,0 +1,51 @@
+<%- include('partials/header') %>
+
+    <div class="frame">
+        <main class="content">
+            <section class="panel-left" aria-hidden="true">
+                <div class="left-inner">
+                    <span class="badge">🚀 Start your journey</span>
+                    <h1 class="title">Join Workah today.</h1>
+                    <p class="subtitle">Create an account to find the perfect job or hire local teens.</p>
+                </div>
+            </section>
+
+            <section class="card" aria-label="Register form">
+                <h2>Create Account</h2>
+                <p class="muted">Join the community</p>
+
+                <% if (error) { %>
+                    <div style="color: var(--danger); margin-bottom: 15px;">
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <form action="/register" method="post">
+                            <div class="form-row">
+                                <label class="label" for="name">Full Name</label>
+                                <input class="input" type="text" id="name" name="name" placeholder="John Doe"
+                                    required />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="label" for="email">Email</label>
+                                <input class="input" type="email" id="email" name="email" placeholder="you@example.com"
+                                    required />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="label" for="password">Password</label>
+                                <input class="input" type="password" id="password" name="password"
+                                    placeholder="••••••••" required />
+                            </div>
+
+                            <div class="actions">
+                                <button class="btn btn-gradient btn-block" type="submit">Sign Up</button>
+                                <a class="btn btn-outline btn-block" href="/login">Already have an account? Login</a>
+                            </div>
+                        </form>
+            </section>
+        </main>
+    </div>
+
+    <%- include('partials/footer') %>

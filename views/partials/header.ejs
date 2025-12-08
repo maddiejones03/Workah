@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workah — Teen Jobs Near You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="container" style="padding-bottom:0">
+        <nav class="nav">
+            <a href="/" class="brand">
+                <div class="logo">W</div>
+                Workah
+            </a>
+            <div class="nav-actions">
+                <% if (user) { %>
+                    <a class="btn" href="/dashboard">Dashboard</a>
+                    <span style="color:white; font-weight:600;">Hello, <%= user.name %></span>
+                    <a class="btn primary" href="/logout">Logout</a>
+                    <% } else { %>
+                        <a class="btn" href="/#search">Search Jobs</a>
+                        <a class="btn primary" href="/login">Get Started / Login</a>
+                        <% } %>
+            </div>
+        </nav>
+    </div>
