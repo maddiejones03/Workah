@@ -570,6 +570,25 @@ button {
   color: #000;
   outline: none;
   transition: border-color .2s ease, box-shadow .2s ease;
+  font-family: inherit;
+
+  /* Persistent focus style requested by user */
+  border-color: rgba(168, 85, 247, .6);
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, .18);
+}
+
+.btn-outline-dark {
+  background: transparent;
+  border: 1px solid #ccc;
+  /* Light gray border */
+  color: #555;
+  /* Dark gray text */
+}
+
+.btn-outline-dark:hover {
+  background: #f9fafb;
+  border-color: #bbb;
+  color: #333;
 }
 
 .input::placeholder {
@@ -606,6 +625,13 @@ button {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .btn-block {
