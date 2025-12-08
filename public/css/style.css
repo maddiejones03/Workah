@@ -14,7 +14,7 @@
   --muted: #6b7280;
   --card: #ffffff;
   --ring: rgba(155, 92, 246, .30);
-  --shadow: 0 20px 45px rgba(2, 6, 23, .20);
+  --shadow: 0 20px 45px rgba(255, 255, 255, 0.2);
   --radius-xl: 28px;
   --radius-lg: 18px;
   --radius-md: 14px;
@@ -179,7 +179,8 @@ a {
 .hero h1 {
   font-size: clamp(36px, 6vw, 64px);
   line-height: 1.06;
-  margin: 10px 0 14px
+  margin: 10px 0 14px;
+  color: var(--card);
 }
 
 .hero p {
@@ -341,7 +342,8 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .section h2 {
-  margin: 0 0 12px
+  margin: 0 0 12px;
+  color: var(--card)
 }
 
 .grid {
@@ -506,6 +508,7 @@ button {
   line-height: 1.1;
   font-weight: 800;
   margin: 8px 0 4px;
+  color: var(--card);
 }
 
 .subtitle {
@@ -517,6 +520,7 @@ button {
 .card h2 {
   margin: 0 0 6px;
   font-size: 22px;
+  color: var(--card);
 }
 
 .card p.muted {
