@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const knex = require('knex')(require('./knexfile').development);
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -29,6 +30,17 @@ app.use((req, res, next) => {
 // Routes
 const authRoutes = require('./routes/auth');
 const jobRoutes = require('./routes/jobs');
+
+// Root route – render main page (index.ejs) with job listings
+app.get('/', async (req, res) => {
+    try {
+        const jobs = await knex('joblisting').select('*');
+        res.render('index', { jobs, searchParams: {} });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
 
 app.use('/', authRoutes);
 app.use('/', jobRoutes);

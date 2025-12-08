@@ -19,26 +19,22 @@
                         required><%= job ? job.description : '' %></textarea>
                 </div>
 
-                <div class="row" style="grid-template-columns: 1fr 1fr;">
+                <div class="row" style="grid-template-columns: 1fr 1fr 1fr;">
                     <div class="field">
                         <label class="label" for="location">Location</label>
                         <input class="input" type="text" id="location" name="location"
                             value="<%= job ? job.location : '' %>" required />
                     </div>
                     <div class="field">
-                        <label class="label" for="pay">Pay Rate</label>
-                        <input class="input" type="text" id="pay" name="pay" value="<%= job ? job.pay : '' %>"
-                            placeholder="$15/hr" required />
+                        <label class="label" for="pay">Hourly Pay</label>
+                        <input class="input" type="number" step="0.01" id="pay" name="pay"
+                            value="<%= job ? job.pay : '' %>" placeholder="15.00" required />
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <label class="label" for="age_range">Age Range</label>
-                    <select class="input" id="age_range" name="age_range">
-                        <option value="14-15" <%=(job && job.age_range==='14-15' ) ? 'selected' : '' %>>14-15</option>
-                        <option value="16-17" <%=(job && job.age_range==='16-17' ) ? 'selected' : '' %>>16-17</option>
-                        <option value="18+" <%=(job && job.age_range==='18+' ) ? 'selected' : '' %>>18+</option>
-                    </select>
+                    <div class="field">
+                        <label class="label" for="hours">Hours/Week</label>
+                        <input class="input" type="number" id="hours" name="hours" value="<%= job ? job.hours : '' %>"
+                            placeholder="20" required />
+                    </div>
                 </div>
 
                 <div class="form-row">

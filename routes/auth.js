@@ -12,15 +12,21 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-        const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-        const user = result.rows[0];
-
-        if (user && await bcrypt.compare(password, user.password)) {
-            req.session.user = { id: user.id, email: user.email, name: user.name, role: user.role };
-            res.redirect('/dashboard');
-        } else {
-            res.render('login', { error: 'Invalid email or password' });
+        // Check Teen User
+        const teen = await knex('teenuser').where({ email }).first();
+        if (teen && teen.password === password) {
+            req.session.user = { id: teen.userid, email: teen.email, name: teen.firstname, role: 'teen' };
+            return res.redirect('/'); // Teens go to landing page to search
         }
+
+        // Check Manager User
+        const manager = await knex('manageruser').where({ email }).first();
+        if (manager && manager.password === password) {
+            req.session.user = { id: manager.managerid, email: manager.email, name: manager.firstname, role: 'manager', companyid: manager.companyid };
+            return res.redirect('/dashboard'); // Managers go to dashboard
+        }
+
+        res.render('login', { error: 'Invalid email or password' });
     } catch (err) {
         console.error(err);
         res.render('login', { error: 'An error occurred' });
@@ -34,14 +40,47 @@ router.get('/register', (req, res) => {
 
 // POST /register
 router.post('/register', async (req, res) => {
-    const { email, password, name } = req.body;
+    const { email, password, firstname, lastname, role, companyname, address, city, state, zipcode, dateofbirth } = req.body;
+
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await db.query('INSERT INTO users (email, password, name) VALUES ($1, $2, $3)', [email, hashedPassword, name]);
-        res.redirect('/login');
+        // Plain text password storage
+        if (role === 'teen') {
+            await knex('teenuser').insert({
+                email,
+                password: password, // Store plain text
+                firstname,
+                lastname,
+                dateofbirth: dateofbirth || '2008-01-01', // Default or required
+                address: address || 'N/A',
+                city: city || 'N/A',
+                state: state || 'N/A',
+                zipcode: zipcode || '00000'
+            });
+            res.redirect('/login');
+        } else if (role === 'manager') {
+            // Create Company first (simplified: create new company for every manager for now)
+            const [company] = await knex('company').insert({
+                companyname: companyname || 'My Company',
+                industry: 'General',
+                location: 'N/A',
+                contactemail: email,
+                phonenumber: '000-000-0000'
+            }).returning('companyid');
+
+            await knex('manageruser').insert({
+                email,
+                password: password, // Store plain text
+                firstname,
+                lastname,
+                companyid: company.companyid
+            });
+            res.redirect('/login');
+        } else {
+            res.render('register', { error: 'Invalid role selected' });
+        }
     } catch (err) {
         console.error(err);
-        res.render('register', { error: 'Email already exists or other error' });
+        res.render('register', { error: 'Registration failed. Email might be taken.' });
     }
 });
 

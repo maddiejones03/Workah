@@ -22,9 +22,24 @@
 
                         <form action="/register" method="post">
                             <div class="form-row">
-                                <label class="label" for="name">Full Name</label>
-                                <input class="input" type="text" id="name" name="name" placeholder="John Doe"
-                                    required />
+                                <label class="label" for="role">I am a...</label>
+                                <select class="input" id="role" name="role" onchange="toggleFields()" required>
+                                    <option value="teen">Teen (Looking for work)</option>
+                                    <option value="manager">Manager (Hiring)</option>
+                                </select>
+                            </div>
+
+                            <div class="row-split">
+                                <div class="form-row" style="flex:1">
+                                    <label class="label" for="firstname">First Name</label>
+                                    <input class="input" type="text" id="firstname" name="firstname" placeholder="Jane"
+                                        required />
+                                </div>
+                                <div class="form-row" style="flex:1">
+                                    <label class="label" for="lastname">Last Name</label>
+                                    <input class="input" type="text" id="lastname" name="lastname" placeholder="Doe"
+                                        required />
+                                </div>
                             </div>
 
                             <div class="form-row">
@@ -39,6 +54,44 @@
                                     placeholder="••••••••" required />
                             </div>
 
+                            <!-- Teen Fields -->
+                            <div id="teen-fields">
+                                <div class="form-row">
+                                    <label class="label" for="dateofbirth">Date of Birth</label>
+                                    <input class="input" type="date" id="dateofbirth" name="dateofbirth" />
+                                </div>
+                                <div class="form-row">
+                                    <label class="label" for="address">Address</label>
+                                    <input class="input" type="text" id="address" name="address"
+                                        placeholder="123 Main St" />
+                                </div>
+                                <div class="row-split">
+                                    <div class="form-row" style="flex:2">
+                                        <label class="label" for="city">City</label>
+                                        <input class="input" type="text" id="city" name="city"
+                                            placeholder="Springfield" />
+                                    </div>
+                                    <div class="form-row" style="flex:1">
+                                        <label class="label" for="state">State</label>
+                                        <input class="input" type="text" id="state" name="state" placeholder="IL" />
+                                    </div>
+                                    <div class="form-row" style="flex:1">
+                                        <label class="label" for="zipcode">Zip</label>
+                                        <input class="input" type="text" id="zipcode" name="zipcode"
+                                            placeholder="62704" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Manager Fields -->
+                            <div id="manager-fields" style="display:none;">
+                                <div class="form-row">
+                                    <label class="label" for="companyname">Company Name</label>
+                                    <input class="input" type="text" id="companyname" name="companyname"
+                                        placeholder="Acme Corp" />
+                                </div>
+                            </div>
+
                             <div class="actions">
                                 <button class="btn btn-gradient btn-block" type="submit">Sign Up</button>
                                 <a class="btn btn-outline btn-block" href="/login">Already have an account? Login</a>
@@ -47,5 +100,21 @@
             </section>
         </main>
     </div>
+
+    <script>
+        function toggleFields() {
+            const role = document.getElementById('role').value;
+            const teenFields = document.getElementById('teen-fields');
+            const managerFields = document.getElementById('manager-fields');
+
+            if (role === 'manager') {
+                teenFields.style.display = 'none';
+                managerFields.style.display = 'block';
+            } else {
+                teenFields.style.display = 'block';
+                managerFields.style.display = 'none';
+            }
+        }
+    </script>
 
     <%- include('partials/footer') %>
