@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const knex = require('knex')(require('../knexfile').development);
+const knex = require('../db');
 
 // GET /login
 router.get('/login', (req, res) => {
