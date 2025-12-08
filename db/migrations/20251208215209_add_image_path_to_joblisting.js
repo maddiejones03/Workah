@@ -1,19 +1,9 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
 exports.up = function (knex) {
-    return knex.schema.table('joblisting', function (table) {
-        table.string('image_path');
-    });
+    // No operation: image_path column added in create_joblisting migration.
+    return Promise.resolve();
 };
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
 exports.down = function (knex) {
-    return knex.schema.table('joblisting', function (table) {
-        table.dropColumn('image_path');
-    });
+    // No operation.
+    return Promise.resolve();
 };
