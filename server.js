@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> 68214bf (making rds accessible to pgadmin)
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
