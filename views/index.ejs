@@ -77,7 +77,8 @@
                             <div class="who" style="margin-top:10px; font-size:12px; color:#888;">
                                 <%= job.hoursperweek %> hrs/week
                             </div>
-                            <a href="/login" class="btn primary btn-block" style="margin-top:12px;">Apply</a>
+                            <a href="/jobs/<%= job.jobid %>/apply" class="btn primary btn-block"
+                                style="margin-top:12px;">Apply</a>
                         </div>
                         <% }); %>
                 </div>
