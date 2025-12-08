@@ -1,9 +1,11 @@
 exports.up = function (knex) {
-    // No operation: image_path column added in create_joblisting migration.
-    return Promise.resolve();
+    return knex.schema.table('joblisting', function (table) {
+        table.string('image_path');
+    });
 };
 
 exports.down = function (knex) {
-    // No operation.
-    return Promise.resolve();
+    return knex.schema.table('joblisting', function (table) {
+        table.dropColumn('image_path');
+    });
 };
