@@ -27,7 +27,7 @@ const isAuthenticated = (req, res, next) => {
 // GET / - Landing Page with Search
 router.get('/', async (req, res) => {
     const { search, location, age } = req.query;
-    let query = knex('jobs').select('*');
+    let query = knex('joblisting').select('*');
 
     if (search) {
         query = query.where('title', 'like', `%${search}%`)
@@ -57,7 +57,7 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
         // Requirement: "security to do something (i.e. edit records, add records, see some type of data, etc.)"
         // Let's say they can see all but only edit their own, or just see their own in dashboard.
         // For simplicity, let's show all jobs created by the user.
-        const jobs = await knex('jobs').where({ created_by: req.session.user.id });
+        const jobs = await knex('joblisting').where({ created_by: req.session.user.id });
         res.render('dashboard', { jobs });
     } catch (err) {
         console.error(err);
@@ -76,7 +76,7 @@ router.post('/jobs/add', isAuthenticated, upload.single('image'), async (req, re
     const image_path = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
-        await knex('jobs').insert({
+        await knex('joblisting').insert({
             title,
             description,
             location,
@@ -95,7 +95,7 @@ router.post('/jobs/add', isAuthenticated, upload.single('image'), async (req, re
 // GET /jobs/edit/:id
 router.get('/jobs/edit/:id', isAuthenticated, async (req, res) => {
     try {
-        const job = await knex('jobs').where({ id: req.params.id, created_by: req.session.user.id }).first();
+        const job = await knex('joblisting').where({ id: req.params.id, created_by: req.session.user.id }).first();
         if (!job) {
             return res.status(404).send('Job not found or unauthorized');
         }
@@ -121,7 +121,7 @@ router.post('/jobs/edit/:id', isAuthenticated, upload.single('image'), async (re
     }
 
     try {
-        await knex('jobs').where({ id: req.params.id, created_by: req.session.user.id }).update(updates);
+        await knex('joblisting').where({ id: req.params.id, created_by: req.session.user.id }).update(updates);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
@@ -132,7 +132,7 @@ router.post('/jobs/edit/:id', isAuthenticated, upload.single('image'), async (re
 // POST /jobs/delete/:id
 router.post('/jobs/delete/:id', isAuthenticated, async (req, res) => {
     try {
-        await knex('jobs').where({ id: req.params.id, created_by: req.session.user.id }).del();
+        await knex('joblisting').where({ id: req.params.id, created_by: req.session.user.id }).del();
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
