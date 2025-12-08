@@ -1,0 +1,3 @@
+[dotenv@17.2.3] injecting env (6) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+Server running at http://localhost:3000
+Connected to PostgreSQL

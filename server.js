@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -37,6 +38,18 @@ app.use('/', jobRoutes);
 // Since the user wants search, let's make the root route handle the landing page and search.
 // But for now, I'll delegate to jobRoutes for the root if it handles the landing page logic.
 // Or I can just import the landing page handler.
+
+const db = require('./db');
+
+app.get("/test-db", async (req, res) => {
+    try {
+        const result = await db.query("SELECT NOW()");
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("DB Error");
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

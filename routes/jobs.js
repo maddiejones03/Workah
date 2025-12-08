@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const knex = require('knex')(require('../knexfile').development);
+const db = require('../db');
 const multer = require('multer');
 const path = require('path');
 
@@ -27,23 +27,30 @@ const isAuthenticated = (req, res, next) => {
 // GET / - Landing Page with Search
 router.get('/', async (req, res) => {
     const { search, location, age } = req.query;
-    let query = knex('jobs').select('*');
+    let query = 'SELECT * FROM jobs WHERE 1=1';
+    const params = [];
+    let paramIndex = 1;
 
     if (search) {
-        query = query.where('title', 'like', `%${search}%`)
-            .orWhere('description', 'like', `%${search}%`);
+        query += ` AND (title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
+        params.push(`%${search}%`);
+        paramIndex++;
     }
     if (location) {
-        query = query.andWhere('location', 'like', `%${location}%`);
+        query += ` AND location ILIKE $${paramIndex}`;
+        params.push(`%${location}%`);
+        paramIndex++;
     }
-    // Simple age filter logic (can be improved)
+    // Simple age filter logic
     if (age) {
-        query = query.andWhere('age_range', 'like', `%${age}%`);
+        query += ` AND age_range ILIKE $${paramIndex}`;
+        params.push(`%${age}%`);
+        paramIndex++;
     }
 
     try {
-        const jobs = await query;
-        res.render('index', { jobs, searchParams: req.query });
+        const result = await db.query(query, params);
+        res.render('index', { jobs: result.rows, searchParams: req.query });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -53,12 +60,8 @@ router.get('/', async (req, res) => {
 // GET /dashboard - Manage Jobs
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
-        // Users can only see their own jobs? Or all jobs? 
-        // Requirement: "security to do something (i.e. edit records, add records, see some type of data, etc.)"
-        // Let's say they can see all but only edit their own, or just see their own in dashboard.
-        // For simplicity, let's show all jobs created by the user.
-        const jobs = await knex('jobs').where({ created_by: req.session.user.id });
-        res.render('dashboard', { jobs });
+        const result = await db.query('SELECT * FROM jobs WHERE created_by = $1', [req.session.user.id]);
+        res.render('dashboard', { jobs: result.rows });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -76,15 +79,10 @@ router.post('/jobs/add', isAuthenticated, upload.single('image'), async (req, re
     const image_path = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
-        await knex('jobs').insert({
-            title,
-            description,
-            location,
-            pay,
-            age_range,
-            image_path,
-            created_by: req.session.user.id
-        });
+        await db.query(
+            'INSERT INTO jobs (title, description, location, pay, age_range, image_path, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+            [title, description, location, pay, age_range, image_path, req.session.user.id]
+        );
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
@@ -95,7 +93,9 @@ router.post('/jobs/add', isAuthenticated, upload.single('image'), async (req, re
 // GET /jobs/edit/:id
 router.get('/jobs/edit/:id', isAuthenticated, async (req, res) => {
     try {
-        const job = await knex('jobs').where({ id: req.params.id, created_by: req.session.user.id }).first();
+        const result = await db.query('SELECT * FROM jobs WHERE id = $1 AND created_by = $2', [req.params.id, req.session.user.id]);
+        const job = result.rows[0];
+
         if (!job) {
             return res.status(404).send('Job not found or unauthorized');
         }
@@ -109,19 +109,21 @@ router.get('/jobs/edit/:id', isAuthenticated, async (req, res) => {
 // POST /jobs/edit/:id
 router.post('/jobs/edit/:id', isAuthenticated, upload.single('image'), async (req, res) => {
     const { title, description, location, pay, age_range } = req.body;
-    const updates = {
-        title,
-        description,
-        location,
-        pay,
-        age_range
-    };
+    let query = 'UPDATE jobs SET title = $1, description = $2, location = $3, pay = $4, age_range = $5';
+    const params = [title, description, location, pay, age_range];
+    let paramIndex = 6;
+
     if (req.file) {
-        updates.image_path = `/uploads/${req.file.filename}`;
+        query += `, image_path = $${paramIndex}`;
+        params.push(`/uploads/${req.file.filename}`);
+        paramIndex++;
     }
 
+    query += ` WHERE id = $${paramIndex} AND created_by = $${paramIndex + 1}`;
+    params.push(req.params.id, req.session.user.id);
+
     try {
-        await knex('jobs').where({ id: req.params.id, created_by: req.session.user.id }).update(updates);
+        await db.query(query, params);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
@@ -132,7 +134,7 @@ router.post('/jobs/edit/:id', isAuthenticated, upload.single('image'), async (re
 // POST /jobs/delete/:id
 router.post('/jobs/delete/:id', isAuthenticated, async (req, res) => {
     try {
-        await knex('jobs').where({ id: req.params.id, created_by: req.session.user.id }).del();
+        await db.query('DELETE FROM jobs WHERE id = $1 AND created_by = $2', [req.params.id, req.session.user.id]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);

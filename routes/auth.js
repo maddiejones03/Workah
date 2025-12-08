@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const knex = require('knex')(require('../knexfile').development);
+const db = require('../db');
 
 // GET /login
 router.get('/login', (req, res) => {
@@ -12,7 +12,9 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await knex('users').where({ email }).first();
+        const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        const user = result.rows[0];
+
         if (user && await bcrypt.compare(password, user.password)) {
             req.session.user = { id: user.id, email: user.email, name: user.name, role: user.role };
             res.redirect('/dashboard');
@@ -35,11 +37,7 @@ router.post('/register', async (req, res) => {
     const { email, password, name } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        await knex('users').insert({
-            email,
-            password: hashedPassword,
-            name
-        });
+        await db.query('INSERT INTO users (email, password, name) VALUES ($1, $2, $3)', [email, hashedPassword, name]);
         res.redirect('/login');
     } catch (err) {
         console.error(err);
