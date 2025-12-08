@@ -1,5 +1,5 @@
 exports.up = function (knex) {
-    // No operation: original jobs table does not exist.
+    // No operation: joblisting table already exists.
     return Promise.resolve();
 };
 
