@@ -55,7 +55,6 @@ app.use('/', jobRoutes);
 // But for now, I'll delegate to jobRoutes for the root if it handles the landing page logic.
 // Or I can just import the landing page handler.
 
-const db = require('./db');
 
 app.get("/test-db", async (req, res) => {
     try {
