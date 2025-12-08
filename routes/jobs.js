@@ -36,22 +36,30 @@ const isManager = (req, res, next) => {
 // GET / - Landing Page with Search
 router.get('/', async (req, res) => {
     const { search, location, age } = req.query;
-    let query = knex('joblisting')
-        .join('company', 'joblisting.companyid', 'company.companyid')
-        .select('joblisting.*', 'company.companyname');
+    let query = `
+        SELECT joblisting.*, company.companyname 
+        FROM joblisting 
+        JOIN company ON joblisting.companyid = company.companyid 
+        WHERE 1=1
+    `;
+    const params = [];
+    let paramIndex = 1;
 
     if (search) {
-        query = query.where('jobtitle', 'ilike', `%${search}%`)
-            .orWhere('jobdescription', 'ilike', `%${search}%`);
+        query += ` AND (joblisting.jobtitle ILIKE $${paramIndex} OR joblisting.jobdescription ILIKE $${paramIndex})`;
+        params.push(`%${search}%`);
+        paramIndex++;
     }
     if (location) {
-        query = query.andWhere('joblisting.location', 'ilike', `%${location}%`);
+        query += ` AND joblisting.location ILIKE $${paramIndex}`;
+        params.push(`%${location}%`);
+        paramIndex++;
     }
-    // Age filter might not map directly anymore unless we add age_range to joblisting or infer it.
-    // For now, ignoring age filter or we can add it to schema later.
+    // Simple age filter logic (can be improved)
+    // if (age) { ... }
 
     try {
-        const result = await db.query(query, params);
+        const result = await db.query(query, params); // Using db.query for raw SQL queries
         res.render('index', { jobs: result.rows, searchParams: req.query });
     } catch (err) {
         console.error(err);
@@ -64,8 +72,8 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
         if (req.session.user.role === 'manager') {
             // Managers see their company's jobs
-            const jobs = await knex('joblisting').where({ companyid: req.session.user.companyid });
-            res.render('dashboard', { jobs, isManager: true });
+            const result = await db.query('SELECT * FROM joblisting WHERE companyid = $1', [req.session.user.companyid]); // Using db.query
+            res.render('dashboard', { jobs: result.rows, isManager: true });
         } else {
             // Teens see... maybe applications? Or just search?
             // For now, redirect teens to landing page or show empty dashboard
@@ -88,16 +96,10 @@ router.post('/jobs/add', isAuthenticated, isManager, upload.single('image'), asy
     const image_path = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
-        await knex('joblisting').insert({
-            jobtitle: title,
-            jobdescription: description,
-            location,
-            hourlypay: pay,
-            hoursperweek: hours || 0,
-            dateposted: new Date(),
-            companyid: req.session.user.companyid,
-            image_path
-        });
+        await db.query(`
+            INSERT INTO joblisting (jobtitle, jobdescription, location, hourlypay, hoursperweek, dateposted, companyid, image_path)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [title, description, location, pay, hours || 0, new Date(), req.session.user.companyid, image_path]); // Using db.query
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
@@ -108,7 +110,9 @@ router.post('/jobs/add', isAuthenticated, isManager, upload.single('image'), asy
 // GET /jobs/edit/:id
 router.get('/jobs/edit/:id', isAuthenticated, isManager, async (req, res) => {
     try {
-        const job = await knex('joblisting').where({ jobid: req.params.id, companyid: req.session.user.companyid }).first();
+        const result = await db.query('SELECT * FROM joblisting WHERE jobid = $1 AND companyid = $2', [req.params.id, req.session.user.companyid]); // Using db.query
+        const job = result.rows[0];
+
         if (!job) {
             return res.status(404).send('Job not found or unauthorized');
         }
@@ -132,24 +136,21 @@ router.get('/jobs/edit/:id', isAuthenticated, isManager, async (req, res) => {
 // POST /jobs/edit/:id
 router.post('/jobs/edit/:id', isAuthenticated, isManager, upload.single('image'), async (req, res) => {
     const { title, description, location, pay, hours } = req.body;
-    const updates = {
-        jobtitle: title,
-        jobdescription: description,
-        location,
-        hourlypay: pay,
-        hoursperweek: hours
-    };
+    let query = 'UPDATE joblisting SET jobtitle = $1, jobdescription = $2, location = $3, hourlypay = $4, hoursperweek = $5';
+    const params = [title, description, location, pay, hours];
+    let paramIndex = 6;
+
     if (req.file) {
         query += `, image_path = $${paramIndex}`;
         params.push(`/uploads/${req.file.filename}`);
         paramIndex++;
     }
 
-    query += ` WHERE id = $${paramIndex} AND created_by = $${paramIndex + 1}`;
-    params.push(req.params.id, req.session.user.id);
+    query += ` WHERE jobid = $${paramIndex} AND companyid = $${paramIndex + 1}`;
+    params.push(req.params.id, req.session.user.companyid);
 
     try {
-        await knex('joblisting').where({ jobid: req.params.id, companyid: req.session.user.companyid }).update(updates);
+        await db.query(query, params); // Using db.query
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
@@ -160,7 +161,7 @@ router.post('/jobs/edit/:id', isAuthenticated, isManager, upload.single('image')
 // POST /jobs/delete/:id
 router.post('/jobs/delete/:id', isAuthenticated, isManager, async (req, res) => {
     try {
-        await knex('joblisting').where({ jobid: req.params.id, companyid: req.session.user.companyid }).del();
+        await db.query('DELETE FROM joblisting WHERE jobid = $1 AND companyid = $2', [req.params.id, req.session.user.companyid]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);

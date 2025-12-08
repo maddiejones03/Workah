@@ -1,8 +1,12 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 68214bf (making rds accessible to pgadmin)
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const knex = require('knex')(require('./knexfile').development);
+const db = require('./db'); // Keep db import as it's used by db.query
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -34,8 +38,12 @@ const jobRoutes = require('./routes/jobs');
 // Root route – render main page (index.ejs) with job listings
 app.get('/', async (req, res) => {
     try {
-        const jobs = await knex('joblisting').select('*');
-        res.render('index', { jobs, searchParams: {} });
+        const result = await db.query(`
+            SELECT joblisting.*, company.companyname 
+            FROM joblisting 
+            JOIN company ON joblisting.companyid = company.companyid
+    `);
+        res.render('index', { jobs: result.rows, searchParams: {} });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');

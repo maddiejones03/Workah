@@ -13,14 +13,18 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         // Check Teen User
-        const teen = await knex('teenuser').where({ email }).first();
+        const teenResult = await db.query('SELECT * FROM teenuser WHERE email = $1', [email]);
+        const teen = teenResult.rows[0];
+
         if (teen && teen.password === password) {
             req.session.user = { id: teen.userid, email: teen.email, name: teen.firstname, role: 'teen' };
             return res.redirect('/'); // Teens go to landing page to search
         }
 
         // Check Manager User
-        const manager = await knex('manageruser').where({ email }).first();
+        const managerResult = await db.query('SELECT * FROM manageruser WHERE email = $1', [email]);
+        const manager = managerResult.rows[0];
+
         if (manager && manager.password === password) {
             req.session.user = { id: manager.managerid, email: manager.email, name: manager.firstname, role: 'manager', companyid: manager.companyid };
             return res.redirect('/dashboard'); // Managers go to dashboard
@@ -45,35 +49,26 @@ router.post('/register', async (req, res) => {
     try {
         // Plain text password storage
         if (role === 'teen') {
-            await knex('teenuser').insert({
-                email,
-                password: password, // Store plain text
-                firstname,
-                lastname,
-                dateofbirth: dateofbirth || '2008-01-01', // Default or required
-                address: address || 'N/A',
-                city: city || 'N/A',
-                state: state || 'N/A',
-                zipcode: zipcode || '00000'
-            });
+            await db.query(`
+                INSERT INTO teenuser (email, password, firstname, lastname, dateofbirth, address, city, state, zipcode)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            `, [email, password, firstname, lastname, dateofbirth || '2008-01-01', address || 'N/A', city || 'N/A', state || 'N/A', zipcode || '00000']);
             res.redirect('/login');
         } else if (role === 'manager') {
             // Create Company first (simplified: create new company for every manager for now)
-            const [company] = await knex('company').insert({
-                companyname: companyname || 'My Company',
-                industry: 'General',
-                location: 'N/A',
-                contactemail: email,
-                phonenumber: '000-000-0000'
-            }).returning('companyid');
+            const companyResult = await db.query(`
+                INSERT INTO company (companyname, industry, location, contactemail, phonenumber)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING companyid
+            `, [companyname || 'My Company', 'General', 'N/A', email, '000-000-0000']);
 
-            await knex('manageruser').insert({
-                email,
-                password: password, // Store plain text
-                firstname,
-                lastname,
-                companyid: company.companyid
-            });
+            const companyId = companyResult.rows[0].companyid;
+
+            await db.query(`
+                INSERT INTO manageruser (email, password, firstname, lastname, companyid)
+                VALUES ($1, $2, $3, $4, $5)
+            `, [email, password, firstname, lastname, companyId]);
+
             res.redirect('/login');
         } else {
             res.render('register', { error: 'Invalid role selected' });
