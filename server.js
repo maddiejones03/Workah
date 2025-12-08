@@ -27,14 +27,18 @@ app.use((req, res, next) => {
 });
 
 // Routes
+// Routes
 const authRoutes = require('./routes/auth');
 const jobRoutes = require('./routes/jobs');
+const searchRoutes = require('./routes/search');
 
 // Root route – render main page (index.ejs) with job listings
 app.get('/', async (req, res) => {
     try {
-        const jobs = await knex('joblisting').select('*');
-        res.render('index', { jobs, searchParams: {} });
+        const jobs = await knex('joblisting')
+            .join('company', 'joblisting.companyid', 'company.companyid')
+            .select('joblisting.*', 'company.companyname');
+        res.render('index', { jobs, searchParams: {}, isSearch: false });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -42,6 +46,7 @@ app.get('/', async (req, res) => {
 });
 
 app.use('/', authRoutes);
+app.use('/search', searchRoutes); // Handles /search
 app.use('/', jobRoutes);
 
 // Landing Page (Search is handled here or in a separate route, but let's put it in jobRoutes or just here)

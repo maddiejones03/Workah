@@ -1,28 +1,30 @@
 <%- include('partials/header') %>
 
     <div class="container">
-        <section class="hero-wrap">
-            <div class="hero-bg" aria-hidden="true"></div>
-            <div class="hero">
-                <div>
-                    <span class="badge">🔒 Parent-Trusted • Teen-Friendly</span>
-                    <h1>The best place for teens to find safe, nearby jobs.</h1>
-                    <p>Discover age-appropriate opportunities within walking distance. Built for summer energy,
-                        school-year balance, and parental peace of mind.</p>
-                    <div class="hero-cta">
-                        <a class="btn primary" href="#search">Find jobs near me</a>
-                        <% if (!user) { %>
-                            <a class="btn" href="/login">Get Started / Login</a>
-                            <% } %>
+        <% if (!isSearch) { %>
+            <section class="hero-wrap">
+                <div class="hero-bg" aria-hidden="true"></div>
+                <div class="hero">
+                    <div>
+                        <span class="badge">🔒 Parent-Trusted • Teen-Friendly</span>
+                        <h1>The best place for teens to find safe, nearby jobs.</h1>
+                        <p>Discover age-appropriate opportunities within walking distance. Built for summer energy,
+                            school-year balance, and parental peace of mind.</p>
+                        <div class="hero-cta">
+                            <a class="btn primary" href="#search">Find jobs near me</a>
+                            <% if (!user) { %>
+                                <a class="btn" href="/login">Get Started / Login</a>
+                                <% } %>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+            <% } %>
     </div>
 
     <!-- SEARCH (glass) -->
     <section id="search" class="search">
-        <form action="/" method="GET">
+        <form action="/search" method="GET">
             <div class="row">
                 <div class="field">
                     <label for="search">Keywords</label>
@@ -36,16 +38,7 @@
                         value="<%= searchParams.location || '' %>">
                 </div>
 
-                <div class="field">
-                    <label for="age">Age filter</label>
-                    <select id="age" name="age">
-                        <option value="">Any Age</option>
-                        <option value="14" <%=searchParams.age==='14' ? 'selected' : '' %>>14–15 (non-hazardous, hour
-                            limits)</option>
-                        <option value="16" <%=searchParams.age==='16' ? 'selected' : '' %>>16–17 (non-hazardous)
-                        </option>
-                    </select>
-                </div>
+
             </div>
 
             <div class="filter-chips" style="margin-top: 15px; justify-content: flex-end;">

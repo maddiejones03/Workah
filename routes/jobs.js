@@ -33,31 +33,7 @@ const isManager = (req, res, next) => {
     }
 };
 
-// GET / - Landing Page with Search
-router.get('/', async (req, res) => {
-    const { search, location, age } = req.query;
-    let query = knex('joblisting')
-        .join('company', 'joblisting.companyid', 'company.companyid')
-        .select('joblisting.*', 'company.companyname');
 
-    if (search) {
-        query = query.where('jobtitle', 'ilike', `%${search}%`)
-            .orWhere('jobdescription', 'ilike', `%${search}%`);
-    }
-    if (location) {
-        query = query.andWhere('joblisting.location', 'ilike', `%${location}%`);
-    }
-    // Age filter might not map directly anymore unless we add age_range to joblisting or infer it.
-    // For now, ignoring age filter or we can add it to schema later.
-
-    try {
-        const jobs = await query;
-        res.render('index', { jobs, searchParams: req.query });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error');
-    }
-});
 
 // GET /dashboard - Manage Jobs
 router.get('/dashboard', isAuthenticated, async (req, res) => {
