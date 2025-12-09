@@ -139,4 +139,46 @@ router.post('/jobs/delete/:id', isAuthenticated, isManager, async (req, res) => 
     }
 });
 
+// GET /jobs/:id/apply - Application Form
+router.get('/jobs/:id/apply', isAuthenticated, async (req, res) => {
+    try {
+        const job = await knex('joblisting')
+            .join('company', 'joblisting.companyid', 'company.companyid')
+            .select('joblisting.*', 'company.companyname')
+            .where({ 'joblisting.jobid': req.params.id })
+            .first();
+
+        if (!job) {
+            return res.status(404).send('Job not found');
+        }
+
+        res.render('application_form', { job });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// POST /jobs/:id/apply - Handle Application
+router.post('/jobs/:id/apply', isAuthenticated, upload.single('resume'), async (req, res) => {
+    try {
+        const job = await knex('joblisting')
+            .join('company', 'joblisting.companyid', 'company.companyid')
+            .select('joblisting.*', 'company.companyname')
+            .where({ 'joblisting.jobid': req.params.id })
+            .first();
+
+        if (!job) {
+            return res.status(404).send('Job not found');
+        }
+
+        // NOTE: Data is not saved to DB as per requirements.
+        // We just render the success view.
+        res.render('application_success', { job });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
 module.exports = router;

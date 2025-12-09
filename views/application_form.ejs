@@ -1,0 +1,43 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div style="max-width: 600px; margin: 40px auto; padding: 20px;">
+            <h2 style="margin-bottom: 20px;">Apply for <%= job.jobtitle %>
+            </h2>
+            <p style="margin-bottom: 20px; color: #666;">at <%= job.companyname %>
+            </p>
+
+            <form action="/jobs/<%= job.jobid %>/apply" method="POST" enctype="multipart/form-data">
+                <div class="field">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="field">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" required>
+                </div>
+
+                <div class="field">
+                    <label for="skills">Skills</label>
+                    <textarea id="skills" name="skills" rows="4" placeholder="List your relevant skills..."></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="experience">Prior Experience</label>
+                    <textarea id="experience" name="experience" rows="4"
+                        placeholder="Tell us about any previous work..."></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="resume">Upload Resume (optional)</label>
+                    <input type="file" id="resume" name="resume">
+                </div>
+
+                <button type="submit" class="btn primary" style="width: 100%; margin-top: 20px;">Submit
+                    Application</button>
+            </form>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>

@@ -28,14 +28,20 @@
             <div class="row">
                 <div class="field">
                     <label for="search">Keywords</label>
-                    <input id="search" name="search" type="text" placeholder="e.g., Retail, Tutor"
-                        value="<%= searchParams.search || '' %>">
+                    <div class="input-wrap">
+                        <span class="input-icon">🔍</span>
+                        <input id="search" name="search" type="text" placeholder="Job title or keyword"
+                            value="<%= searchParams.search || '' %>">
+                    </div>
                 </div>
 
                 <div class="field">
                     <label for="location">Location</label>
-                    <input id="location" name="location" type="text" placeholder="City or Zip"
-                        value="<%= searchParams.location || '' %>">
+                    <div class="input-wrap">
+                        <span class="input-icon">📍</span>
+                        <input id="location" name="location" type="text" placeholder="City, State or Zip"
+                            value="<%= searchParams.location || '' %>">
+                    </div>
                 </div>
 
 
@@ -46,10 +52,7 @@
             </div>
         </form>
     </section>
-
     <div class="container">
-        <div class="spacer"></div>
-
         <!-- JOB RESULTS -->
         <section id="catalog" class="section">
             <h2 style="font-size:28px;margin-bottom:8px">Available Jobs</h2>
@@ -77,7 +80,8 @@
                             <div class="who" style="margin-top:10px; font-size:12px; color:#888;">
                                 <%= job.hoursperweek %> hrs/week
                             </div>
-                            <a href="/login" class="btn primary btn-block" style="margin-top:12px;">Apply</a>
+                            <a href="/jobs/<%= job.jobid %>/apply" class="btn primary btn-block"
+                                style="margin-top:12px;">Apply</a>
                         </div>
                         <% }); %>
                 </div>

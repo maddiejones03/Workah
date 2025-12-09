@@ -1,0 +1,20 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div style="max-width: 600px; margin: 100px auto; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+            <h1 style="margin-bottom: 15px;">Application Received!</h1>
+            <p style="color: #666; font-size: 18px; margin-bottom: 30px;">
+                Your application for <strong>
+                    <%= job.jobtitle %>
+                </strong> has been successfully submitted.
+            </p>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a href="/" class="btn primary">Browse More Jobs</a>
+                <a href="/dashboard" class="btn">Go to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
