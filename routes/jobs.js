@@ -59,9 +59,8 @@ router.get('/jobs/add', isAuthenticated, isManager, (req, res) => {
 });
 
 // POST /jobs/add
-router.post('/jobs/add', isAuthenticated, isManager, upload.single('image'), async (req, res) => {
+router.post('/jobs/add', isAuthenticated, isManager, async (req, res) => {
     const { title, description, location, pay, hours } = req.body;
-    const image_path = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
         await knex('joblisting').insert({
@@ -71,8 +70,7 @@ router.post('/jobs/add', isAuthenticated, isManager, upload.single('image'), asy
             hourlypay: pay,
             hoursperweek: hours || 0,
             dateposted: new Date(),
-            companyid: req.session.user.companyid,
-            image_path
+            companyid: req.session.user.companyid
         });
         res.redirect('/dashboard');
     } catch (err) {
@@ -95,8 +93,7 @@ router.get('/jobs/edit/:id', isAuthenticated, isManager, async (req, res) => {
             description: job.jobdescription,
             location: job.location,
             pay: job.hourlypay,
-            hours: job.hoursperweek,
-            image_path: job.image_path
+            hours: job.hoursperweek
         };
         res.render('job_form', { job: mappedJob, action: `/jobs/edit/${job.jobid}` });
     } catch (err) {
@@ -106,7 +103,7 @@ router.get('/jobs/edit/:id', isAuthenticated, isManager, async (req, res) => {
 });
 
 // POST /jobs/edit/:id
-router.post('/jobs/edit/:id', isAuthenticated, isManager, upload.single('image'), async (req, res) => {
+router.post('/jobs/edit/:id', isAuthenticated, isManager, async (req, res) => {
     const { title, description, location, pay, hours } = req.body;
     const updates = {
         jobtitle: title,
@@ -115,9 +112,6 @@ router.post('/jobs/edit/:id', isAuthenticated, isManager, upload.single('image')
         hourlypay: pay,
         hoursperweek: hours
     };
-    if (req.file) {
-        updates.image_path = `/uploads/${req.file.filename}`;
-    }
 
     try {
         await knex('joblisting').where({ jobid: req.params.id, companyid: req.session.user.companyid }).update(updates);
